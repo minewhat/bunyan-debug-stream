@@ -167,7 +167,7 @@ class BunyanDebugStream extends Writable
         if typeof(entry) is 'string' then entry = JSON.parse(entry)
 
         colorsToApply = @_colors[entry.level ? bunyan.INFO]
-
+        preColorsToApply = @_colors[bunyan.TRACE]
         # src is the filename/line number
         src = srcToString entry.src, @_basepath, @options.basepathReplacement
         if src then src += ': '
@@ -218,9 +218,9 @@ class BunyanDebugStream extends Writable
         if @_showPid             then processStr += "[#{entry.pid}]"
         if processStr.length > 0 then processStr += " "
         levelPrefix = if @_showLevel then (LEVELS[entry.level]?.prefix ? '      ') + ' ' else ''
-
+        linePrefix = "#{date}#{processStr}#{levelPrefix}#{src}#{prefixes}"
         line = "
-            #{date}#{processStr}#{levelPrefix}#{src}#{prefixes}#{applyColors message, colorsToApply}
+            #{applyColors linePrefix, preColorsToApply}#{applyColors message, colorsToApply}
         "
 
         line += "\n#{@_indent}#{request}" if request?
